@@ -6,6 +6,7 @@ import android.content.Context;
 import android.util.Log;
 import android.view.MotionEvent;
 
+import org.rajawali3d.Geometry3D;
 import org.rajawali3d.Object3D;
 import org.rajawali3d.animation.Animation;
 import org.rajawali3d.animation.EllipticalOrbitAnimation3D;
@@ -44,6 +45,7 @@ public class Renderer extends RajawaliRenderer implements IAsyncLoaderCallback {
     private Object3D parsedObject;
     private double mRotate;
     private int plus;
+    private float[] mVerticesArray;
 
     public Renderer(Context context) {
         super(context);
@@ -170,11 +172,14 @@ public class Renderer extends RajawaliRenderer implements IAsyncLoaderCallback {
         rayVector[2] /= rayLength;
 
         float[] collisionPoint = {0f, 0f, 0f};
+
         float[] objectCenter = {
                 (float) object.getWorldPosition().x,
                 (float) object.getWorldPosition().y,
                 (float) object.getWorldPosition().z,
         };
+
+        getVertices();
 
         //Iterating over ray vector to check for collisions
         for (int i = 0; i < 1000; i++) {
@@ -182,17 +187,24 @@ public class Renderer extends RajawaliRenderer implements IAsyncLoaderCallback {
             collisionPoint[1] = rayVector[1] * rayLength / 1000 * i;
             collisionPoint[2] = -rayVector[2] * rayLength / 1000 * i;
 
-//            Log.d("nathan", "checkCollision vector : x "+collisionPoint[0]+" y "+collisionPoint[1]+" z "+collisionPoint[2]);
-//
-//            Log.d("nathan", "checkCollision: objects : x "+object.getX()+" y "+object.getY()+" z "+object.getZ()+"/n");
+            for (int j = 0; j < mVerticesArray.length / 3; j += 3) {
 
-            if (poinSphereCollision(collisionPoint, objectCenter, 2)) {
+                Vector3 verticeInWorld = getWorldPosition(mVerticesArray[j], mVerticesArray[j + 1], mVerticesArray[j + 2]);
 
-                Log.d("nathan", "checkCollision vector : x " + collisionPoint[0] + " y " + collisionPoint[1] + " z " + collisionPoint[2]);
+                float[] verticeInWorldFloat = {
+                        (float) verticeInWorld.x,
+                        (float) verticeInWorld.y,
+                        (float) verticeInWorld.z
+                };
 
-                Log.d("nathan", "checkCollision: objects : x " + objectCenter[0] + " y " + objectCenter[1] + " z " + objectCenter[2] + "/n");
+                if (poinSphereCollision(collisionPoint, verticeInWorldFloat, 2)) {
 
-                return true;
+                    Log.d("nathan", "checkCollision vector : x " + collisionPoint[0] + " y " + collisionPoint[1] + " z " + collisionPoint[2]);
+
+                    Log.d("nathan", "checkCollision: objects : x " + objectCenter[0] + " y " + objectCenter[1] + " z " + objectCenter[2] + "/n");
+
+                    return true;
+                }
             }
         }
 
@@ -212,13 +224,30 @@ public class Renderer extends RajawaliRenderer implements IAsyncLoaderCallback {
                 (point[1] - center[1]) * (point[1] - center[1])  < (radius * radius));
     }
 
+    private float[] getVertices() {
 
-    @Override
-    public Vector3 unProject(double x, double y, double z) {
+        Geometry3D geometry3D = parsedObject.getGeometry();
 
-        return super.unProject(x, y, z);
+        mVerticesArray = Geometry3D.getFloatArrayFromBuffer(geometry3D.getVertices());
 
+        return mVerticesArray;
     }
+
+
+    public Vector3 getWorldPosition(double x, double y, double z) {
+        if (parsedObject.getModelMatrix() == null) return new Vector3(x, y, z);
+        Vector3 worldPos = new Vector3(x, y, z);
+        worldPos.multiply(parsedObject.getModelMatrix());
+        return worldPos;
+    }
+
+
+//    @Override
+//    public Vector3 unProject(double x, double y, double z) {
+//
+//        return super.unProject(x, y, z);
+//
+//    }
 
     @Override
     public void onModelLoadComplete(ALoader loader) {
@@ -249,9 +278,9 @@ public class Renderer extends RajawaliRenderer implements IAsyncLoaderCallback {
 
         parsedObject.setMaterial(material);
 
-        parsedObject.setScale(5);
+        parsedObject.setScale(3);
 
-        parsedObject.setPosition(10,0,0);
+        parsedObject.setPosition(-10,0,10);
 
         getCurrentScene().addChild(parsedObject);
 
