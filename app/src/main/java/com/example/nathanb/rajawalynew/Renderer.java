@@ -23,13 +23,17 @@ import org.rajawali3d.math.vector.Vector3;
 import org.rajawali3d.primitives.Sphere;
 import org.rajawali3d.renderer.RajawaliRenderer;
 import org.rajawali3d.util.ArrayUtils;
+import org.rajawali3d.util.ObjectColorPicker;
+import org.rajawali3d.util.OnObjectPickedListener;
 import org.rajawali3d.util.RajLog;
+
+import static android.content.ContentValues.TAG;
 
 /**
  * Created by nathanb on 11/2/2017.
  */
 
-public class Renderer extends RajawaliRenderer implements IAsyncLoaderCallback {
+public class Renderer extends RajawaliRenderer implements IAsyncLoaderCallback, OnObjectPickedListener {
 
 
     private static final float RAY_ITERATIONS = 1000;
@@ -44,6 +48,8 @@ public class Renderer extends RajawaliRenderer implements IAsyncLoaderCallback {
     private Object3D parsedObject;
     private double mRotate;
     private int plus;
+    private ObjectColorPicker mPicker;
+    private Object3D parsedObject2;
 
     public Renderer(Context context) {
         super(context);
@@ -83,7 +89,7 @@ public class Renderer extends RajawaliRenderer implements IAsyncLoaderCallback {
 //
 //        earthSphere.setPosition(2,-3,5);
 
-        final LoaderOBJ loaderOBJ = new LoaderOBJ(mContext.getResources(), mTextureManager, R.raw.e100mod_obj);
+        final LoaderOBJ loaderOBJ = new LoaderOBJ(mContext.getResources(), mTextureManager, R.raw.double_obj);
         loadModel(loaderOBJ, this, R.raw.e100mod_obj);
     }
 
@@ -213,22 +219,21 @@ public class Renderer extends RajawaliRenderer implements IAsyncLoaderCallback {
     }
 
 
-    @Override
-    public Vector3 unProject(double x, double y, double z) {
-
-        return super.unProject(x, y, z);
-
-    }
 
     @Override
     public void onModelLoadComplete(ALoader loader) {
 
         RajLog.d("Model load complete: " + loader);
         final LoaderOBJ obj = (LoaderOBJ) loader;
-        parsedObject = obj.getParsedObject();
+        parsedObject = obj.getParsedObject().getChildAt(0);
         parsedObject.setPosition(Vector3.ZERO);
         parsedObject.setDoubleSided(true);
         parsedObject.setBackSided(true);
+
+        parsedObject2 = obj.getParsedObject().getChildAt(1);
+        parsedObject2.setPosition(Vector3.ZERO);
+        parsedObject2.setDoubleSided(true);
+        parsedObject2.setBackSided(true);
 
 
 
@@ -249,22 +254,36 @@ public class Renderer extends RajawaliRenderer implements IAsyncLoaderCallback {
 
         parsedObject.setMaterial(material);
 
-        parsedObject.setScale(5);
+        parsedObject.setScale(7);
 
         parsedObject.setPosition(10,0,0);
 
         getCurrentScene().addChild(parsedObject);
 
+        parsedObject2.setMaterial(material);
+
+        parsedObject2.setScale(7);
+
+        parsedObject2.setPosition(10,0,0);
+
+        getCurrentScene().addChild(parsedObject2);
+
         mCameraAnim = new RotateOnAxisAnimation(Vector3.Axis.Y, 360);
         mCameraAnim.setDurationMilliseconds(8000);
         mCameraAnim.setRepeatMode(Animation.RepeatMode.INFINITE);
         mCameraAnim.setTransformable3D(parsedObject);
+        mCameraAnim.setTransformable3D(parsedObject2);
 
         getCurrentScene().registerAnimation(mCameraAnim);
 
         mCameraAnim.play();
 
         getCurrentCamera().setZ(100);
+
+        mPicker = new ObjectColorPicker(this);
+        mPicker.setOnObjectPickedListener(this);
+        mPicker.registerObject(parsedObject);
+        mPicker.registerObject(parsedObject2);
 
     }
 
@@ -298,5 +317,17 @@ public class Renderer extends RajawaliRenderer implements IAsyncLoaderCallback {
 
            // Log.d(TAG, "checkCollision vec3 : x " + vec3.x + " y " + vec3.y + " z " + vec3.z);
         }
+    }
+
+    public void getObjectAt(float x, float y) {
+
+        mPicker.getObjectAt(x, y);
+
+    }
+
+    @Override
+    public void onObjectPicked(Object3D object) {
+
+        Log.d(TAG, "onObjectPicked: Touchhhhh "+object.getName());
     }
 }

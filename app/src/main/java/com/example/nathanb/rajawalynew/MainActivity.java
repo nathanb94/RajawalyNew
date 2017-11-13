@@ -10,7 +10,7 @@ import android.view.View;
 import org.rajawali3d.surface.IRajawaliSurface;
 import org.rajawali3d.surface.RajawaliSurfaceView;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnTouchListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
     private Renderer renderer;
@@ -34,15 +34,18 @@ public class MainActivity extends AppCompatActivity {
 
         surface.setSurfaceRenderer(renderer);
 
-        surface.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
+        surface.setOnTouchListener(this);
 
-                renderer.onTouch(motionEvent);
 
-                return true;
-            }
-        });
+//        surface.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View view, MotionEvent motionEvent) {
+//
+//                renderer.onTouch(motionEvent);
+//
+//                return true;
+//            }
+//        });
 
     }
 
@@ -55,5 +58,16 @@ public class MainActivity extends AppCompatActivity {
 
     public void minus(View view) {
         renderer.setPlus(-10);
+    }
+
+    @Override
+    public boolean onTouch(View view, MotionEvent motionEvent) {
+
+        if(motionEvent.getAction() == MotionEvent.ACTION_DOWN)
+        {
+            // this needs to be defined on the renderer:
+            renderer.getObjectAt(motionEvent.getX(), motionEvent.getY());
+        }
+        return super.onTouchEvent(motionEvent);
     }
 }
