@@ -1,7 +1,0 @@
-newmtl lambert13SG
-illum 4
-Kd 0 0 0
-Ka 0 0 0
-Tf 1 1 1
-map_Kd farmhouse_texture.jpg
-Ni 1.00

@@ -4,36 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.nathanb.rajawaly.MainActivity">
+    tools:context="com.example.nathanb.rajawalynew.Object3DActivity">
 
     <org.rajawali3d.surface.RajawaliSurfaceView
         android:id="@+id/surface"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <Button
-        android:id="@+id/btn_minus"
-        android:onClick="minus"
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:background="#f11818"
-        android:text="-"
-        android:gravity="center"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        />
-
-    <Button
-
-        android:id="@+id/btn_plus"
-        android:onClick="plus"
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:background="#f11818"
-        android:text="+"
-        android:gravity="center"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        />
 
 </RelativeLayout>
