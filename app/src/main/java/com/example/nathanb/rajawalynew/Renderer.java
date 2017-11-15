@@ -45,6 +45,16 @@ public class Renderer extends org.rajawali3d.renderer.Renderer implements IAsync
 
     private ArrayList<Object3D> object3DArrayList;
 
+    public boolean left;
+
+    public boolean right;
+
+    public boolean up;
+
+    public boolean down;
+
+    private Object3D mParsedObject;
+
 
     public Renderer(Activity context, onRenderListener listener) {
 
@@ -131,6 +141,37 @@ public class Renderer extends org.rajawali3d.renderer.Renderer implements IAsync
 
         super.onRender(elapsedTime, deltaTime);
 
+        if (mParsedObject != null) {
+
+            if (left) {
+
+                mParsedObject.setRotY(mParsedObject.getRotY() - 1);
+
+            }
+            if (right) {
+
+                mParsedObject.setRotY(mParsedObject.getRotY() + 1);
+
+            }
+
+            if (up) {
+
+                mParsedObject.setRotX(mParsedObject.getRotX() + 1);
+
+            }
+
+            if (down) {
+
+                mParsedObject.setRotX(mParsedObject.getRotX() - 1);
+
+            }
+
+            up = false;
+            down = false;
+            right = false;
+            left = false;
+
+        }
     }
 
 
@@ -143,11 +184,11 @@ public class Renderer extends org.rajawali3d.renderer.Renderer implements IAsync
 
         final LoaderOBJ obj = (LoaderOBJ) loader;
 
-        Object3D parsedObject = obj.getParsedObject();
+        mParsedObject = obj.getParsedObject();
 
-        for (int i = 0; i < parsedObject.getNumChildren(); i++){
+        for (int i = 0; i < mParsedObject.getNumChildren(); i++){
 
-            object3DArrayList.add(parsedObject.getChildAt(i));
+            object3DArrayList.add(mParsedObject.getChildAt(i));
 
         }
 
@@ -178,17 +219,17 @@ public class Renderer extends org.rajawali3d.renderer.Renderer implements IAsync
             getCurrentScene().addChild(object3D);
 
 
-            RotateOnAxisAnimation mCameraAnim = new RotateOnAxisAnimation(Vector3.Axis.Y, 360);
-
-            mCameraAnim.setDurationMilliseconds(8000);
-
-            mCameraAnim.setRepeatMode(Animation.RepeatMode.INFINITE);
-
-            mCameraAnim.setTransformable3D(object3D);
-
-            getCurrentScene().registerAnimation(mCameraAnim);
-
-            mCameraAnim.play();
+//            RotateOnAxisAnimation mCameraAnim = new RotateOnAxisAnimation(Vector3.Axis.Y, 360);
+//
+//            mCameraAnim.setDurationMilliseconds(8000);
+//
+//            mCameraAnim.setRepeatMode(Animation.RepeatMode.INFINITE);
+//
+//            mCameraAnim.setTransformable3D(object3D);
+//
+//            getCurrentScene().registerAnimation(mCameraAnim);
+//
+//            mCameraAnim.play();
 
 
             if (object3D.getName().equals("cube") || object3D.getName().equals("cubesecond")) {

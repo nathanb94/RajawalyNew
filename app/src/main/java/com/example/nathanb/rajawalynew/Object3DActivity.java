@@ -11,9 +11,17 @@ import org.rajawali3d.view.TextureView;
 
 public class Object3DActivity extends AppCompatActivity implements View.OnTouchListener, Renderer.onRenderListener {
 
-    private Renderer renderer;
+    private Renderer mRenderer;
 
     TextureView surface = null;
+
+    private float xpos;
+
+    private float ypos;
+
+    private float xd;
+
+    private float yd;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,9 +34,9 @@ public class Object3DActivity extends AppCompatActivity implements View.OnTouchL
 
         surface.setRenderMode(TextureView.RENDERMODE_WHEN_DIRTY);
 
-        renderer = new Renderer(this, this);
+        mRenderer = new Renderer(this, this);
 
-        surface.setSurfaceRenderer(renderer);
+        surface.setSurfaceRenderer(mRenderer);
 
         surface.setOnTouchListener(this);
 
@@ -39,29 +47,53 @@ public class Object3DActivity extends AppCompatActivity implements View.OnTouchL
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
 
-        if(motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+        if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
 
-            // this needs to be defined on the renderer:
-            renderer.getObjectAt(motionEvent.getX(), motionEvent.getY());
+            mRenderer.getObjectAt(motionEvent.getX(), motionEvent.getY());
+
+            xpos = motionEvent.getX();
+            ypos = motionEvent.getY();
 
         }
 
-        return super.onTouchEvent(motionEvent);
+        if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
+            xpos = -1;
+            ypos = -1;
+
+        }
+
+        if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
+            xd = motionEvent.getX() - xpos;
+            yd = motionEvent.getY() - ypos;
+
+            xpos = motionEvent.getX();
+            ypos = motionEvent.getY();
+
+            if (xd < 0) {
+                mRenderer.up = true;
+            } else {
+                mRenderer.down = true;
+            }
+            if (yd < 0) {
+                mRenderer.left = true;
+            } else {
+                mRenderer.right = true;
+            }
+
+        }
+
+        return true;
 
     }
 
     @Override
     public void onClick(final String s) {
 
-        new Thread()
-        {
-            public void run()
-            {
-                Object3DActivity.this.runOnUiThread(new Runnable()
-                {
-                    public void run()
-                    {
-                        Toast.makeText(Object3DActivity.this, s ,Toast.LENGTH_SHORT).show();
+        new Thread() {
+            public void run() {
+                Object3DActivity.this.runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast.makeText(Object3DActivity.this, s, Toast.LENGTH_SHORT).show();
                     }
                 });
             }
