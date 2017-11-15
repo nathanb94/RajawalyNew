@@ -6,8 +6,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
 
-import org.rajawali3d.surface.IRajawaliSurface;
-import org.rajawali3d.surface.RajawaliSurfaceView;
+import org.rajawali3d.view.TextureView;
 
 public class Object3DActivity extends AppCompatActivity implements View.OnTouchListener, Renderer.onRenderListener {
 
@@ -15,18 +14,18 @@ public class Object3DActivity extends AppCompatActivity implements View.OnTouchL
 
     private Renderer renderer;
 
-    RajawaliSurfaceView surface = null;
+    TextureView surface = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        surface = (RajawaliSurfaceView) findViewById(R.id.surface);
+        surface = (TextureView) findViewById(R.id.surface);
 
         surface.setFrameRate(60.0);
 
-        surface.setRenderMode(IRajawaliSurface.RENDERMODE_WHEN_DIRTY);
+        surface.setRenderMode(TextureView.RENDERMODE_WHEN_DIRTY);
 
         renderer = new Renderer(this, this);
 

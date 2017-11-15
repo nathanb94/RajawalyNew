@@ -2,14 +2,12 @@ package com.example.nathanb.rajawalynew; /**
  * Created by nathanb on 11/9/2017.
  */
 
-import android.content.Context;
+import android.app.Activity;
+
 import android.content.SharedPreferences;
+
 import android.util.Log;
 import android.view.MotionEvent;
-import android.widget.Toast;
-
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import org.rajawali3d.Object3D;
 import org.rajawali3d.animation.Animation;
@@ -22,14 +20,12 @@ import org.rajawali3d.materials.Material;
 import org.rajawali3d.materials.textures.ATexture;
 import org.rajawali3d.materials.textures.Texture;
 import org.rajawali3d.math.vector.Vector3;
-import org.rajawali3d.renderer.RajawaliRenderer;
+
 import org.rajawali3d.util.ObjectColorPicker;
 import org.rajawali3d.util.OnObjectPickedListener;
 import org.rajawali3d.util.RajLog;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.List;
 
 import static android.content.ContentValues.TAG;
 
@@ -37,10 +33,12 @@ import static android.content.ContentValues.TAG;
  * Created by nathanb on 11/2/2017.
  */
 
-public class Renderer extends RajawaliRenderer implements IAsyncLoaderCallback, OnObjectPickedListener {
+public class Renderer extends org.rajawali3d.renderer.Renderer implements IAsyncLoaderCallback, OnObjectPickedListener {
 
 
-    private final Context context;
+    private static final String INTENT_TYPE = "INTENT_TYPE";
+    private static final String INTENT_LOCATION = "INTENT_LOCATION";
+    private final Activity context;
 
     private final onRenderListener mListener;
 
@@ -80,7 +78,12 @@ public class Renderer extends RajawaliRenderer implements IAsyncLoaderCallback, 
 
     private ArrayList<Object3D> object3DArrayList;
 
-    public Renderer(Context context, onRenderListener listener) {
+    private SharedPreferences mPrefs;
+
+    private Object3D gloabalObject;
+    private String fileName;
+
+    public Renderer(Activity context, onRenderListener listener) {
 
         super(context);
 
@@ -89,6 +92,7 @@ public class Renderer extends RajawaliRenderer implements IAsyncLoaderCallback, 
         setFrameRate(60);
 
         mListener = listener;
+
     }
 
     @Override
@@ -100,14 +104,9 @@ public class Renderer extends RajawaliRenderer implements IAsyncLoaderCallback, 
 
         initMaterials();
 
-            final LoaderOBJ loaderOBJ = new LoaderOBJ(mContext.getResources(), mTextureManager, R.raw.car_obj);
-            loadModel(loaderOBJ, this, R.raw.car_obj);
+        final LoaderOBJ loaderOBJ = new LoaderOBJ(mContext.getResources(), mTextureManager, R.raw.car_obj);
+        loadModel(loaderOBJ, this, R.raw.car_obj);
 
-//        }else {
-//
-//            showObjects();
-//
-//        }
     }
 
     private void initMaterials() {
@@ -129,9 +128,9 @@ public class Renderer extends RajawaliRenderer implements IAsyncLoaderCallback, 
 
         material1 = new Material();
 
-        material1.setColor(new float[]{0,0,0,0});
+        material1.setColor(new float[]{0, 0, 0, 0});
 
-        material.setColor(new float[]{0,0,0,0});
+        material.setColor(new float[]{0, 0, 0, 0});
 
     }
 
@@ -156,7 +155,6 @@ public class Renderer extends RajawaliRenderer implements IAsyncLoaderCallback, 
     }
 
 
-
     @Override
     public void onOffsetsChanged(float xOffset, float yOffset, float xOffsetStep, float yOffsetStep, int xPixelOffset, int yPixelOffset) {
 
@@ -175,8 +173,6 @@ public class Renderer extends RajawaliRenderer implements IAsyncLoaderCallback, 
     }
 
 
-
-
     @Override
     public void onModelLoadComplete(ALoader loader) {
 
@@ -184,6 +180,8 @@ public class Renderer extends RajawaliRenderer implements IAsyncLoaderCallback, 
 
         RajLog.d("Model load complete: " + loader);
         final LoaderOBJ obj = (LoaderOBJ) loader;
+
+        gloabalObject = obj.getParsedObject();
 
         parsedObject = obj.getParsedObject().getChildAt(2);
         object3DArrayList.add(parsedObject);
@@ -231,7 +229,7 @@ public class Renderer extends RajawaliRenderer implements IAsyncLoaderCallback, 
 
         mPicker.setOnObjectPickedListener(this);
 
-        for (Object3D object3D : object3DArrayList){
+        for (Object3D object3D : object3DArrayList) {
 
             object3D.setPosition(Vector3.ZERO);
 
@@ -243,7 +241,7 @@ public class Renderer extends RajawaliRenderer implements IAsyncLoaderCallback, 
 
             object3D.setScale(6);
 
-            object3D.setPosition(0,0,0);
+            object3D.setPosition(0, 0, 0);
 
             getCurrentScene().addChild(object3D);
 
@@ -256,7 +254,7 @@ public class Renderer extends RajawaliRenderer implements IAsyncLoaderCallback, 
 
             mCameraAnim.play();
 
-            if (object3D.getName().equals("cube") || object3D.getName().equals("cubesecond")){
+            if (object3D.getName().equals("cube") || object3D.getName().equals("cubesecond")) {
 
                 object3D.setMaterial(material1);
 
@@ -288,17 +286,19 @@ public class Renderer extends RajawaliRenderer implements IAsyncLoaderCallback, 
 //        mPicker.registerObject(parsedObject3);
         mPicker.registerObject(object3DArrayList.get(5));
 
+
     }
+
 
     @Override
     public void onModelLoadFailed(ALoader aLoader) {
-        RajLog.e(this, "Model load failed: " + aLoader);
+        RajLog.e("Model load failed: " + aLoader);
     }
 
 
     public void getObjectAt(float x, float y) {
 
-        if(mPicker != null){
+        if (mPicker != null) {
 
             mPicker.getObjectAt(x, y);
 
@@ -309,20 +309,25 @@ public class Renderer extends RajawaliRenderer implements IAsyncLoaderCallback, 
     @Override
     public void onObjectPicked(Object3D object) {
 
-        Log.d(TAG, "onObjectPicked: Touchhhhh "+object.getName());
+        Log.d(TAG, "onObjectPicked: Touchhhhh " + object.getName());
 
-        if (object.getName().equals("cube")){
+        if (object.getName().equals("cube")) {
 
             mListener.onClick("this is the engine ventilation");
 
-        }else if (object.getName().equals("cubesecond")){
+        } else if (object.getName().equals("cubesecond")) {
 
             mListener.onClick("this is the left door");
         }
     }
 
+    @Override
+    public void onNoObjectPicked() {
 
-    public interface onRenderListener{
+    }
+
+
+    public interface onRenderListener {
 
         void onClick(String s);
     }
