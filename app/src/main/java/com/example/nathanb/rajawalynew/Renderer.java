@@ -1,11 +1,8 @@
-package com.example.nathanb.rajawalynew; /**
- * Created by nathanb on 11/9/2017.
- */
+package com.example.nathanb.rajawalynew;
 
 import android.app.Activity;
 
-import android.content.SharedPreferences;
-
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.MotionEvent;
 
@@ -36,41 +33,11 @@ import static android.content.ContentValues.TAG;
 public class Renderer extends org.rajawali3d.renderer.Renderer implements IAsyncLoaderCallback, OnObjectPickedListener {
 
 
-    private static final String INTENT_TYPE = "INTENT_TYPE";
-    private static final String INTENT_LOCATION = "INTENT_LOCATION";
-    private final Activity context;
-
     private final onRenderListener mListener;
 
     private PointLight mLight;
 
-    private RotateOnAxisAnimation mCameraAnim;
-
-    private Object3D parsedObject;
-
     private ObjectColorPicker mPicker;
-
-    private Object3D parsedObject2;
-
-    private Object3D parsedObject3;
-
-    private Object3D parsedObject4;
-
-    private Object3D parsedObject5;
-
-    private Object3D parsedObject6;
-
-    private Object3D parsedObject7;
-
-    private Object3D parsedObject8;
-
-    private Object3D parsedObject9;
-
-    private Object3D parsedObject10;
-
-    private Object3D parsedObject11;
-
-    private Object3D parsedObject12;
 
     private Material material;
 
@@ -78,16 +45,10 @@ public class Renderer extends org.rajawali3d.renderer.Renderer implements IAsync
 
     private ArrayList<Object3D> object3DArrayList;
 
-    private SharedPreferences mPrefs;
-
-    private Object3D gloabalObject;
-    private String fileName;
 
     public Renderer(Activity context, onRenderListener listener) {
 
         super(context);
-
-        this.context = context;
 
         setFrameRate(60);
 
@@ -176,48 +137,19 @@ public class Renderer extends org.rajawali3d.renderer.Renderer implements IAsync
     @Override
     public void onModelLoadComplete(ALoader loader) {
 
-        object3DArrayList = new ArrayList<Object3D>();
+        object3DArrayList = new ArrayList<>();
 
         RajLog.d("Model load complete: " + loader);
+
         final LoaderOBJ obj = (LoaderOBJ) loader;
 
-        gloabalObject = obj.getParsedObject();
+        Object3D parsedObject = obj.getParsedObject();
 
-        parsedObject = obj.getParsedObject().getChildAt(2);
-        object3DArrayList.add(parsedObject);
+        for (int i = 0; i < parsedObject.getNumChildren(); i++){
 
-        parsedObject2 = obj.getParsedObject().getChildAt(0);
-        object3DArrayList.add(parsedObject2);
+            object3DArrayList.add(parsedObject.getChildAt(i));
 
-        parsedObject3 = obj.getParsedObject().getChildAt(11);
-        object3DArrayList.add(parsedObject3);
-
-        parsedObject4 = obj.getParsedObject().getChildAt(1);
-        object3DArrayList.add(parsedObject4);
-
-        parsedObject5 = obj.getParsedObject().getChildAt(3);
-        object3DArrayList.add(parsedObject5);
-
-        parsedObject6 = obj.getParsedObject().getChildAt(4);
-        object3DArrayList.add(parsedObject6);
-
-        parsedObject7 = obj.getParsedObject().getChildAt(5);
-        object3DArrayList.add(parsedObject7);
-
-        parsedObject8 = obj.getParsedObject().getChildAt(6);
-        object3DArrayList.add(parsedObject8);
-
-        parsedObject9 = obj.getParsedObject().getChildAt(7);
-        object3DArrayList.add(parsedObject9);
-
-        parsedObject10 = obj.getParsedObject().getChildAt(8);
-        object3DArrayList.add(parsedObject10);
-
-        parsedObject11 = obj.getParsedObject().getChildAt(9);
-        object3DArrayList.add(parsedObject11);
-
-        parsedObject12 = obj.getParsedObject().getChildAt(10);
-        object3DArrayList.add(parsedObject12);
+        }
 
         showObjects();
 
@@ -245,14 +177,19 @@ public class Renderer extends org.rajawali3d.renderer.Renderer implements IAsync
 
             getCurrentScene().addChild(object3D);
 
-            mCameraAnim = new RotateOnAxisAnimation(Vector3.Axis.Y, 360);
+
+            RotateOnAxisAnimation mCameraAnim = new RotateOnAxisAnimation(Vector3.Axis.Y, 360);
+
             mCameraAnim.setDurationMilliseconds(8000);
+
             mCameraAnim.setRepeatMode(Animation.RepeatMode.INFINITE);
+
             mCameraAnim.setTransformable3D(object3D);
 
             getCurrentScene().registerAnimation(mCameraAnim);
 
             mCameraAnim.play();
+
 
             if (object3D.getName().equals("cube") || object3D.getName().equals("cubesecond")) {
 
@@ -266,26 +203,9 @@ public class Renderer extends org.rajawali3d.renderer.Renderer implements IAsync
 
         }
 
-
-//        parsedObject2.setMaterial(material1);
-//
-//        parsedObject2.setAlpha(0);
-//
-//        // parsedObject2.setTransparent(true);
-//
-//        parsedObject3.setMaterial(material1);
-//
-//        parsedObject3.setAlpha(0);
-//
-//        //parsedObject3.setTransparent(true);
-
         getCurrentCamera().setZ(100);
 
-
-//        mPicker.registerObject(parsedObject2);
-//        mPicker.registerObject(parsedObject3);
         mPicker.registerObject(object3DArrayList.get(5));
-
 
     }
 
@@ -307,7 +227,7 @@ public class Renderer extends org.rajawali3d.renderer.Renderer implements IAsync
     }
 
     @Override
-    public void onObjectPicked(Object3D object) {
+    public void onObjectPicked(@NonNull Object3D object) {
 
         Log.d(TAG, "onObjectPicked: Touchhhhh " + object.getName());
 

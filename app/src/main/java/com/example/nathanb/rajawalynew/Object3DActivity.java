@@ -1,5 +1,6 @@
 package com.example.nathanb.rajawalynew;
 
+import android.annotation.SuppressLint;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MotionEvent;
@@ -10,8 +11,6 @@ import org.rajawali3d.view.TextureView;
 
 public class Object3DActivity extends AppCompatActivity implements View.OnTouchListener, Renderer.onRenderListener {
 
-    private static final String TAG = Object3DActivity.class.getSimpleName();
-
     private Renderer renderer;
 
     TextureView surface = null;
@@ -21,7 +20,7 @@ public class Object3DActivity extends AppCompatActivity implements View.OnTouchL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        surface = (TextureView) findViewById(R.id.surface);
+        surface = findViewById(R.id.surface);
 
         surface.setFrameRate(60.0);
 
@@ -36,6 +35,7 @@ public class Object3DActivity extends AppCompatActivity implements View.OnTouchL
     }
 
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouch(View view, MotionEvent motionEvent) {
 
