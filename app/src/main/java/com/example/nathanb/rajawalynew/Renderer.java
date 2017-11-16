@@ -9,6 +9,7 @@ import android.view.MotionEvent;
 import org.rajawali3d.Object3D;
 import org.rajawali3d.animation.Animation;
 import org.rajawali3d.animation.RotateOnAxisAnimation;
+import org.rajawali3d.cameras.ArcballCamera;
 import org.rajawali3d.lights.PointLight;
 import org.rajawali3d.loader.ALoader;
 import org.rajawali3d.loader.LoaderOBJ;
@@ -16,11 +17,14 @@ import org.rajawali3d.loader.async.IAsyncLoaderCallback;
 import org.rajawali3d.materials.Material;
 import org.rajawali3d.materials.textures.ATexture;
 import org.rajawali3d.materials.textures.Texture;
+import org.rajawali3d.math.Quaternion;
 import org.rajawali3d.math.vector.Vector3;
 
+import org.rajawali3d.util.GLU;
 import org.rajawali3d.util.ObjectColorPicker;
 import org.rajawali3d.util.OnObjectPickedListener;
 import org.rajawali3d.util.RajLog;
+import org.rajawali3d.view.TextureView;
 
 import java.util.ArrayList;
 
@@ -34,6 +38,8 @@ public class Renderer extends org.rajawali3d.renderer.Renderer implements IAsync
 
 
     private final onRenderListener mListener;
+    private final Activity context;
+    private final TextureView surface;
 
     private PointLight mLight;
 
@@ -45,24 +51,20 @@ public class Renderer extends org.rajawali3d.renderer.Renderer implements IAsync
 
     private ArrayList<Object3D> object3DArrayList;
 
-    public boolean left;
-
-    public boolean right;
-
-    public boolean up;
-
-    public boolean down;
-
     private Object3D mParsedObject;
 
 
-    public Renderer(Activity context, onRenderListener listener) {
+    public Renderer(Activity context, onRenderListener listener, TextureView surface) {
 
         super(context);
 
         setFrameRate(60);
 
         mListener = listener;
+
+        this.context = context;
+
+        this.surface = surface;
 
     }
 
@@ -127,7 +129,8 @@ public class Renderer extends org.rajawali3d.renderer.Renderer implements IAsync
 
 
     @Override
-    public void onOffsetsChanged(float xOffset, float yOffset, float xOffsetStep, float yOffsetStep, int xPixelOffset, int yPixelOffset) {
+    public void onOffsetsChanged(float xOffset, float yOffset, float xOffsetStep,
+                                 float yOffsetStep, int xPixelOffset, int yPixelOffset) {
 
     }
 
@@ -141,37 +144,6 @@ public class Renderer extends org.rajawali3d.renderer.Renderer implements IAsync
 
         super.onRender(elapsedTime, deltaTime);
 
-        if (mParsedObject != null) {
-
-            if (left) {
-
-                mParsedObject.setRotY(mParsedObject.getRotY() - 1);
-
-            }
-            if (right) {
-
-                mParsedObject.setRotY(mParsedObject.getRotY() + 1);
-
-            }
-
-            if (up) {
-
-                mParsedObject.setRotX(mParsedObject.getRotX() + 1);
-
-            }
-
-            if (down) {
-
-                mParsedObject.setRotX(mParsedObject.getRotX() - 1);
-
-            }
-
-            up = false;
-            down = false;
-            right = false;
-            left = false;
-
-        }
     }
 
 
@@ -186,7 +158,7 @@ public class Renderer extends org.rajawali3d.renderer.Renderer implements IAsync
 
         mParsedObject = obj.getParsedObject();
 
-        for (int i = 0; i < mParsedObject.getNumChildren(); i++){
+        for (int i = 0; i < mParsedObject.getNumChildren(); i++) {
 
             object3DArrayList.add(mParsedObject.getChildAt(i));
 
@@ -201,6 +173,14 @@ public class Renderer extends org.rajawali3d.renderer.Renderer implements IAsync
         mPicker = new ObjectColorPicker(this);
 
         mPicker.setOnObjectPickedListener(this);
+
+        ArcballCamera arcball = new ArcballCamera(context, surface);
+
+        arcball.setTarget(mParsedObject); //your 3D Object
+        
+        arcball.setPosition(0,0,100); //optional
+
+        getCurrentScene().replaceAndSwitchCamera(getCurrentCamera(), arcball);
 
         for (Object3D object3D : object3DArrayList) {
 
@@ -219,17 +199,7 @@ public class Renderer extends org.rajawali3d.renderer.Renderer implements IAsync
             getCurrentScene().addChild(object3D);
 
 
-//            RotateOnAxisAnimation mCameraAnim = new RotateOnAxisAnimation(Vector3.Axis.Y, 360);
-//
-//            mCameraAnim.setDurationMilliseconds(8000);
-//
-//            mCameraAnim.setRepeatMode(Animation.RepeatMode.INFINITE);
-//
-//            mCameraAnim.setTransformable3D(object3D);
-//
-//            getCurrentScene().registerAnimation(mCameraAnim);
-//
-//            mCameraAnim.play();
+            //setAnimation(object3D);
 
 
             if (object3D.getName().equals("cube") || object3D.getName().equals("cubesecond")) {
@@ -244,9 +214,25 @@ public class Renderer extends org.rajawali3d.renderer.Renderer implements IAsync
 
         }
 
-        getCurrentCamera().setZ(100);
+        getCurrentCamera().setLookAt(mParsedObject.getPosition());
 
         mPicker.registerObject(object3DArrayList.get(5));
+
+    }
+
+    private void setAnimation(Object3D object3D) {
+
+        RotateOnAxisAnimation mCameraAnim = new RotateOnAxisAnimation(Vector3.Axis.Y, 360);
+
+        mCameraAnim.setDurationMilliseconds(8000);
+
+        mCameraAnim.setRepeatMode(Animation.RepeatMode.INFINITE);
+
+        mCameraAnim.setTransformable3D(object3D);
+
+        getCurrentScene().registerAnimation(mCameraAnim);
+
+        mCameraAnim.play();
 
     }
 
@@ -288,11 +274,52 @@ public class Renderer extends org.rajawali3d.renderer.Renderer implements IAsync
     }
 
 
+
     public interface onRenderListener {
 
         void onClick(String s);
     }
 }
+//
+//    private double[] mNearPos4;
+//    private double[] mFarPos4;
+//    private Vector3 mNearPos;
+//    private Vector3 mFarPos;
+//    private Vector3 mNewObjPos;
+//
+//    public void move(float x, float y) {
+//        if (object3DArrayList != null) {
+//
+//            for (int i = 0; i < object3DArrayList.size(); i++) {
+//
+//                int[] viewport = new int[]{0, 0, getViewportWidth(), getViewportHeight()};
+//                double[] nearPos = new double[4];
+//                double[] farPos = new double[4];
+//
+//                GLU.gluUnProject(x, getViewportHeight() - y, 0,
+//                        getCurrentCamera().getViewMatrix().getDoubleValues(), 0,
+//                        getCurrentCamera().getProjectionMatrix().getDoubleValues(), 0,
+//                        viewport, 0, nearPos, 0);
+//                GLU.gluUnProject(x, getViewportHeight() - y, 1.f,
+//                        getCurrentCamera().getViewMatrix().getDoubleValues(), 0,
+//                        getCurrentCamera().getProjectionMatrix().getDoubleValues(), 0,
+//                        viewport, 0, farPos, 0);
+//
+//                Vector3 nearVec = new Vector3(nearPos[0] / nearPos[3], nearPos[1] / nearPos[3], nearPos[2] / nearPos[3]);
+//                Vector3 farVec = new Vector3(farPos[0] / farPos[3], farPos[1] / farPos[3], farPos[2] / farPos[3]);
+//
+//                float factor = (float) ((Math.abs(object3DArrayList.get(i).getZ()) + nearVec.z) / (getCurrentCamera().getFarPlane() - getCurrentCamera().getNearPlane()));
+//
+//                Vector3 diff = farVec.subtract(nearVec);
+//                diff.multiply(factor);
+//                nearVec.add(diff);
+//
+//                object3DArrayList.get(i).setX(nearVec.x);
+//                object3DArrayList.get(i).setY(nearVec.y - 4);
+//            }
+//        }
+//    }
+
 
 //    /**
 //     * Convert the 4D input into 3D space (or something like that, otherwise the gluUnproject values are incorrect)

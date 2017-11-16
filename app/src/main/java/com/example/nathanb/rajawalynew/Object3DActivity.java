@@ -3,6 +3,7 @@ package com.example.nathanb.rajawalynew;
 import android.annotation.SuppressLint;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.FloatMath;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
@@ -15,14 +16,6 @@ public class Object3DActivity extends AppCompatActivity implements View.OnTouchL
 
     TextureView surface = null;
 
-    private float xpos;
-
-    private float ypos;
-
-    private float xd;
-
-    private float yd;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,7 +27,7 @@ public class Object3DActivity extends AppCompatActivity implements View.OnTouchL
 
         surface.setRenderMode(TextureView.RENDERMODE_WHEN_DIRTY);
 
-        mRenderer = new Renderer(this, this);
+        mRenderer = new Renderer(this, this, surface);
 
         surface.setSurfaceRenderer(mRenderer);
 
@@ -45,45 +38,18 @@ public class Object3DActivity extends AppCompatActivity implements View.OnTouchL
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
-    public boolean onTouch(View view, MotionEvent motionEvent) {
+    public boolean onTouch(View view, MotionEvent event) {
 
-        if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN)
+        {
 
-            mRenderer.getObjectAt(motionEvent.getX(), motionEvent.getY());
+            mRenderer.getObjectAt(event.getX(), event.getY());
 
-            xpos = motionEvent.getX();
-            ypos = motionEvent.getY();
 
-        }
-
-        if (motionEvent.getAction() == MotionEvent.ACTION_UP) {
-            xpos = -1;
-            ypos = -1;
-
-        }
-
-        if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
-            xd = motionEvent.getX() - xpos;
-            yd = motionEvent.getY() - ypos;
-
-            xpos = motionEvent.getX();
-            ypos = motionEvent.getY();
-
-            if (xd < 0) {
-                mRenderer.up = true;
-            } else {
-                mRenderer.down = true;
-            }
-            if (yd < 0) {
-                mRenderer.left = true;
-            } else {
-                mRenderer.right = true;
-            }
 
         }
 
         return true;
-
     }
 
     @Override
@@ -100,4 +66,6 @@ public class Object3DActivity extends AppCompatActivity implements View.OnTouchL
         }.start();
 
     }
+
+
 }
