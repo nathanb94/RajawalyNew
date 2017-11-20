@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.MotionEvent;
-
 import org.rajawali3d.Object3D;
 import org.rajawali3d.lights.PointLight;
 import org.rajawali3d.loader.ALoader;
@@ -15,12 +14,10 @@ import org.rajawali3d.materials.Material;
 import org.rajawali3d.materials.textures.ATexture;
 import org.rajawali3d.materials.textures.Texture;
 import org.rajawali3d.math.vector.Vector3;
-
 import org.rajawali3d.util.ObjectColorPicker;
 import org.rajawali3d.util.OnObjectPickedListener;
 import org.rajawali3d.util.RajLog;
 import org.rajawali3d.view.TextureView;
-
 import java.util.ArrayList;
 
 import static android.content.ContentValues.TAG;
@@ -73,23 +70,23 @@ public class Renderer extends org.rajawali3d.renderer.Renderer implements IAsync
         initMaterials();
 
         final LoaderOBJ loaderOBJ = new LoaderOBJ(mContext.getResources(), mTextureManager, R.raw.car_obj);
+
         loadModel(loaderOBJ, this, R.raw.car_obj);
 
     }
 
     private void initMaterials() {
 
-        Texture earthTexture = new Texture("Earth", R.drawable.body);
-
         material = new Material();
-//        material.enableLighting(true);
-//        material.setDiffuseMethod(new DiffuseMethod.Lambert());
+
+        Texture earthTexture = new Texture("CAR", R.drawable.body);
 
         try {
 
             material.addTexture(mTextureManager.addTexture(earthTexture));
 
         } catch (ATexture.TextureException error) {
+
             Log.d("DEBUG", "TEXTURE ERROR");
 
         }
@@ -106,8 +103,6 @@ public class Renderer extends org.rajawali3d.renderer.Renderer implements IAsync
 
         getCurrentScene().addLight(mLight);
 
-        getCurrentCamera().setZ(16);
-
         getCurrentScene().setBackgroundColor(0.7f, 0.7f, 0.7f, 1.0f);
 
     }
@@ -119,18 +114,6 @@ public class Renderer extends org.rajawali3d.renderer.Renderer implements IAsync
         mLight.setPosition(0, 0, 4);
 
         mLight.setPower(3);
-
-    }
-
-
-    @Override
-    public void onOffsetsChanged(float xOffset, float yOffset, float xOffsetStep,
-                                 float yOffsetStep, int xPixelOffset, int yPixelOffset) {
-
-    }
-
-    @Override
-    public void onTouchEvent(MotionEvent event) {
 
     }
 
@@ -159,6 +142,10 @@ public class Renderer extends org.rajawali3d.renderer.Renderer implements IAsync
 
         }
 
+        Log.d(TAG, "onModelLoadComplete: before");
+
+        Log.d(TAG, "onModelLoadComplete: after");
+
         showObjects();
 
     }
@@ -171,7 +158,7 @@ public class Renderer extends org.rajawali3d.renderer.Renderer implements IAsync
 
         MyArcballCamera arcball = new MyArcballCamera(context, this, surface, mParsedObject);
 
-        arcball.setPosition(0,0,100); //optional
+        arcball.setPosition(0, 0, 100); //optional
 
         getCurrentScene().replaceAndSwitchCamera(getCurrentCamera(), arcball);
 
@@ -212,12 +199,6 @@ public class Renderer extends org.rajawali3d.renderer.Renderer implements IAsync
     }
 
 
-    @Override
-    public void onModelLoadFailed(ALoader aLoader) {
-        RajLog.e("Model load failed: " + aLoader);
-    }
-
-
     private void getObjectAt(float x, float y) {
 
         if (mPicker != null) {
@@ -227,6 +208,12 @@ public class Renderer extends org.rajawali3d.renderer.Renderer implements IAsync
         }
 
     }
+
+    @Override
+    public void onModelLoadFailed(ALoader aLoader) {
+        RajLog.e("Model load failed: " + aLoader);
+    }
+
 
     @Override
     public void onObjectPicked(@NonNull Object3D object) {
@@ -256,11 +243,23 @@ public class Renderer extends org.rajawali3d.renderer.Renderer implements IAsync
 
     }
 
+    @Override
+    public void onOffsetsChanged(float xOffset, float yOffset, float xOffsetStep, float yOffsetStep, int xPixelOffset, int yPixelOffset) {
+
+    }
+
+    @Override
+    public void onTouchEvent(MotionEvent event) {
+
+    }
+
 
     public interface onRenderListener {
 
         void onClick(String s);
+
     }
+
 }
 
 

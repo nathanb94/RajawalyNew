@@ -31,13 +31,21 @@ public class Object3DActivity extends AppCompatActivity implements Renderer.onRe
     public void onClick(final String s) {
 
         new Thread() {
+
             public void run() {
+
                 Object3DActivity.this.runOnUiThread(new Runnable() {
+
                     public void run() {
+
                         Toast.makeText(Object3DActivity.this, s, Toast.LENGTH_SHORT).show();
+
                     }
+
                 });
+
             }
+
         }.start();
 
     }
