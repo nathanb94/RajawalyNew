@@ -41,6 +41,8 @@ public class MyArcballCamera extends Camera {
     private Vector3 mScratchVector;
     private double mStartFOV;
     private MyArcballCameraListener mListener;
+    private float mDownX;
+    private float mDownY;
 
     public MyArcballCamera(Context context, MyArcballCameraListener listener, View view) {
         this(context, listener, view, null);
@@ -129,7 +131,7 @@ public class MyArcballCamera extends Camera {
             rotationAxis.cross(mCurrSphereCoord);
             rotationAxis.normalize();
 
-            double rotationAngle = -Math.acos(Math.min(1, mPrevSphereCoord.dot(mCurrSphereCoord)));
+            double rotationAngle = -Math.acos(Math.min(1, mPrevSphereCoord.dot(mCurrSphereCoord)));// "-" for true rotation direction (in the original class this is inverted)
             mCurrentOrientation.fromAngleAxis(rotationAxis, MathUtil.radiansToDegrees(rotationAngle));
             mCurrentOrientation.normalize();
 
@@ -191,7 +193,9 @@ public class MyArcballCamera extends Camera {
 
                         if (event.getAction() == MotionEvent.ACTION_DOWN) {
 
-                            mListener.onObjectClicked(event.getX(), event.getY());
+                            mDownX = event.getX();
+
+                            mDownY = event.getY();
 
                         }
 
@@ -206,6 +210,12 @@ public class MyArcballCamera extends Camera {
                                     endRotation();
 
                                     mIsRotating = false;
+
+                                }
+
+                                if (Math.abs(mDownX - event.getX()) < 50 && Math.abs(mDownY - event.getY()) < 50){
+
+                                    mListener.onObjectClicked(event.getX(), event.getY());
 
                                 }
                             }
