@@ -34,7 +34,7 @@ import static android.content.ContentValues.TAG;
  * Created by nathanb on 11/2/2017.
  */
 
-public class Renderer extends org.rajawali3d.renderer.Renderer implements IAsyncLoaderCallback, OnObjectPickedListener {
+public class Renderer extends org.rajawali3d.renderer.Renderer implements IAsyncLoaderCallback, OnObjectPickedListener, MyArcballCamera.MyArcballCameraListener {
 
 
     private final onRenderListener mListener;
@@ -174,10 +174,8 @@ public class Renderer extends org.rajawali3d.renderer.Renderer implements IAsync
 
         mPicker.setOnObjectPickedListener(this);
 
-        ArcballCamera arcball = new ArcballCamera(context, surface);
+        MyArcballCamera arcball = new MyArcballCamera(context, this, surface, mParsedObject);
 
-        arcball.setTarget(mParsedObject); //your 3D Object
-        
         arcball.setPosition(0,0,100); //optional
 
         getCurrentScene().replaceAndSwitchCamera(getCurrentCamera(), arcball);
@@ -273,6 +271,13 @@ public class Renderer extends org.rajawali3d.renderer.Renderer implements IAsync
 
     }
 
+    //Personal listener from MyCArcballCamera
+    @Override
+    public void onObjectClicked(float x, float y) {
+
+        getObjectAt(x, y);
+
+    }
 
 
     public interface onRenderListener {

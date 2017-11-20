@@ -46,7 +46,6 @@ public class Object3DActivity extends AppCompatActivity implements View.OnTouchL
             mRenderer.getObjectAt(event.getX(), event.getY());
 
 
-
         }
 
         return true;
