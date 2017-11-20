@@ -1,5 +1,6 @@
 package com.example.nathanb.rajawalynew;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.view.GestureDetector;
@@ -14,7 +15,6 @@ import org.rajawali3d.math.Matrix4;
 import org.rajawali3d.math.Quaternion;
 import org.rajawali3d.math.vector.Vector2;
 import org.rajawali3d.math.vector.Vector3;
-import org.rajawali3d.renderer.*;
 
 /**
  * Created by nathanb on 11/20/2017.
@@ -28,7 +28,6 @@ public class MyArcballCamera extends Camera {
     private View mView;
     private boolean mIsRotating;
     private boolean mIsScaling;
-    private Vector3 mCameraStartPos;
     private Vector3 mPrevSphereCoord;
     private Vector3 mCurrSphereCoord;
     private Vector2 mPrevScreenCoord;
@@ -44,11 +43,8 @@ public class MyArcballCamera extends Camera {
     private float mDownX;
     private float mDownY;
 
-    public MyArcballCamera(Context context, MyArcballCameraListener listener, View view) {
-        this(context, listener, view, null);
-    }
 
-    public MyArcballCamera(Context context, MyArcballCameraListener listener,  View view, Object3D target) {
+    MyArcballCamera(Context context, MyArcballCameraListener listener, View view, Object3D target) {
         super();
         mContext = context;
         mTarget = target;
@@ -65,7 +61,6 @@ public class MyArcballCamera extends Camera {
         mEmpty = new Object3D();
         mScratchMatrix = new Matrix4();
         mScratchVector = new Vector3();
-        mCameraStartPos = new Vector3();
         mPrevSphereCoord = new Vector3();
         mCurrSphereCoord = new Vector3();
         mPrevScreenCoord = new Vector2();
@@ -187,6 +182,7 @@ public class MyArcballCamera extends Camera {
 
                 mGestureListener = new View.OnTouchListener() {
 
+                    @SuppressLint("ClickableViewAccessibility")
                     public boolean onTouch(View v, MotionEvent event) {
 
                         mScaleDetector.onTouchEvent(event);
@@ -234,7 +230,6 @@ public class MyArcballCamera extends Camera {
         mTarget = target;
         setLookAt(mTarget.getPosition());
     }
-
     public Object3D getTarget() {
         return mTarget;
     }

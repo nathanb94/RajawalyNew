@@ -1,18 +1,12 @@
 package com.example.nathanb.rajawalynew;
 
-import android.annotation.SuppressLint;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.FloatMath;
-import android.view.MotionEvent;
-import android.view.View;
 import android.widget.Toast;
 
 import org.rajawali3d.view.TextureView;
 
-public class Object3DActivity extends AppCompatActivity implements View.OnTouchListener, Renderer.onRenderListener {
-
-    private Renderer mRenderer;
+public class Object3DActivity extends AppCompatActivity implements Renderer.onRenderListener {
 
     TextureView surface = null;
 
@@ -27,28 +21,10 @@ public class Object3DActivity extends AppCompatActivity implements View.OnTouchL
 
         surface.setRenderMode(TextureView.RENDERMODE_WHEN_DIRTY);
 
-        mRenderer = new Renderer(this, this, surface);
+        Renderer mRenderer = new Renderer(this, this, surface);
 
         surface.setSurfaceRenderer(mRenderer);
 
-        surface.setOnTouchListener(this);
-
-    }
-
-
-    @SuppressLint("ClickableViewAccessibility")
-    @Override
-    public boolean onTouch(View view, MotionEvent event) {
-
-        if (event.getAction() == MotionEvent.ACTION_DOWN)
-        {
-
-            mRenderer.getObjectAt(event.getX(), event.getY());
-
-
-        }
-
-        return true;
     }
 
     @Override

@@ -7,9 +7,6 @@ import android.util.Log;
 import android.view.MotionEvent;
 
 import org.rajawali3d.Object3D;
-import org.rajawali3d.animation.Animation;
-import org.rajawali3d.animation.RotateOnAxisAnimation;
-import org.rajawali3d.cameras.ArcballCamera;
 import org.rajawali3d.lights.PointLight;
 import org.rajawali3d.loader.ALoader;
 import org.rajawali3d.loader.LoaderOBJ;
@@ -17,10 +14,8 @@ import org.rajawali3d.loader.async.IAsyncLoaderCallback;
 import org.rajawali3d.materials.Material;
 import org.rajawali3d.materials.textures.ATexture;
 import org.rajawali3d.materials.textures.Texture;
-import org.rajawali3d.math.Quaternion;
 import org.rajawali3d.math.vector.Vector3;
 
-import org.rajawali3d.util.GLU;
 import org.rajawali3d.util.ObjectColorPicker;
 import org.rajawali3d.util.OnObjectPickedListener;
 import org.rajawali3d.util.RajLog;
@@ -54,7 +49,7 @@ public class Renderer extends org.rajawali3d.renderer.Renderer implements IAsync
     private Object3D mParsedObject;
 
 
-    public Renderer(Activity context, onRenderListener listener, TextureView surface) {
+    Renderer(Activity context, onRenderListener listener, TextureView surface) {
 
         super(context);
 
@@ -196,9 +191,7 @@ public class Renderer extends org.rajawali3d.renderer.Renderer implements IAsync
 
             getCurrentScene().addChild(object3D);
 
-
             //setAnimation(object3D);
-
 
             if (object3D.getName().equals("cube") || object3D.getName().equals("cubesecond")) {
 
@@ -218,22 +211,6 @@ public class Renderer extends org.rajawali3d.renderer.Renderer implements IAsync
 
     }
 
-    private void setAnimation(Object3D object3D) {
-
-        RotateOnAxisAnimation mCameraAnim = new RotateOnAxisAnimation(Vector3.Axis.Y, 360);
-
-        mCameraAnim.setDurationMilliseconds(8000);
-
-        mCameraAnim.setRepeatMode(Animation.RepeatMode.INFINITE);
-
-        mCameraAnim.setTransformable3D(object3D);
-
-        getCurrentScene().registerAnimation(mCameraAnim);
-
-        mCameraAnim.play();
-
-    }
-
 
     @Override
     public void onModelLoadFailed(ALoader aLoader) {
@@ -241,7 +218,7 @@ public class Renderer extends org.rajawali3d.renderer.Renderer implements IAsync
     }
 
 
-    public void getObjectAt(float x, float y) {
+    private void getObjectAt(float x, float y) {
 
         if (mPicker != null) {
 
@@ -285,6 +262,23 @@ public class Renderer extends org.rajawali3d.renderer.Renderer implements IAsync
         void onClick(String s);
     }
 }
+
+
+//    private void setAnimation(Object3D object3D) {
+//
+//        RotateOnAxisAnimation mCameraAnim = new RotateOnAxisAnimation(Vector3.Axis.Y, 360);
+//
+//        mCameraAnim.setDurationMilliseconds(8000);
+//
+//        mCameraAnim.setRepeatMode(Animation.RepeatMode.INFINITE);
+//
+//        mCameraAnim.setTransformable3D(object3D);
+//
+//        getCurrentScene().registerAnimation(mCameraAnim);
+//
+//        mCameraAnim.play();
+//
+//    }
 //
 //    private double[] mNearPos4;
 //    private double[] mFarPos4;
