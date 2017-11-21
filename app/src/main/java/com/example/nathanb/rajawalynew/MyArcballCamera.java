@@ -21,6 +21,7 @@ import org.rajawali3d.math.vector.Vector3;
  */
 
 public class MyArcballCamera extends Camera {
+
     private Context mContext;
     private ScaleGestureDetector mScaleDetector;
     private View.OnTouchListener mGestureListener;
